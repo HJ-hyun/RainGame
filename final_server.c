@@ -22,7 +22,7 @@ typedef struct userRank{//파일에 저장할 유저들의 정보 저장
 
 USER user[10];
 USERRANK rank[NUM];
-int cnt=0;
+static int cnt=0;
 void error_handling(char *buf);
 void sort();
 
@@ -80,33 +80,33 @@ int main(int argc, char *argv[])
 					if(fd_max < clnt_sock)
 						fd_max=clnt_sock;
 					memset(buf,0,BUF_SIZE);
-                    memset(user,0,sizeof(user));//초기화 안하면 연결 끊어도 같은 이름만 들어감
+                    //memset(user,0,sizeof(user));//초기화 안하면 연결 끊어도 같은 이름만 들어감
                     str_len=read(clnt_sock,buf,BUF_SIZE);//get username
 					printf("connected user: %s %d\n", buf,clnt_sock);
 					user[cnt].fd=clnt_sock;
-					strcpy(user[cnt].username,buf);
-					cnt++;
+                    strcpy(user[cnt].username,buf);	
+                    cnt++;
 					printf("usernum: %d\n",cnt);
 				}
-				else // read message
+				else   // read message
 				{
-                    //fp2=fdopen(i,"w");
 					memset(buf,0,BUF_SIZE);
                     str_len=read(i, buf, BUF_SIZE);
-					//printf("%d\n",str_len);
                     if(str_len==0) // close request
 					{
 						FD_CLR(i, &reads);
 						close(i);
-                        //fclose(fp2);
                         printf("closed client: %d \n", i);
 					}
-					else//end game get score
+                    else //end game get score
 					{
                         int j=0,k=1;
-						while(user[j].fd!=i)
-                            j++;
-                        user[j].score=atoi(buf);//buf에 점수 저장되어있음
+                        
+                        while(user[j].fd!=i){
+                            j++; 
+                        }
+                        
+                        user[j].score=atoi(buf);//buf에 점수
                         FILE*fp;
                         fp=fopen("rank.txt","r");
                         //FILE*fp2=fdopen(i,"w");
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
                         //현재 클라이언트의 이름과 점수 저장(원래 저장되어 있던 점수와 비교 하려고)
                         strcpy(rank[k].username,user[j].username);
                         rank[k].score=user[j].score;
-                        //printf("%s %d\n",rank[k].username,rank[k].score);
+                        
                         sort();
                     
                         if(k<NUM-1){
